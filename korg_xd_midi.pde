@@ -18,8 +18,8 @@ boolean shape_type=false; // circle or line
 
 
 void setup() {
-  //size(800, 800);
-  fullScreen();
+  size(800, 800);
+  // fullScreen();
   colorMode(HSB, 1.0);
   background(.618, .618, .32);
   println("pre list");
