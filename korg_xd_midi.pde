@@ -109,3 +109,26 @@ void controllerChange(int channel, int number, int value) {
     println(rot_vel);
   }
 }
+
+void keyPressed() {
+if (key == 's' || key == 'S') {
+    String export_filename_png = "output/korg_xd_midi-"+get_curr_datetime()+".png";
+    pg.save(export_filename_png);
+    println("Saved to: " + export_filename_png);
+  }
+}
+
+  String get_curr_datetime() {
+  // Get current date and time
+  int year = year();
+  int month = month();
+  int day = day();
+  int hour = hour();
+  int minute = minute();
+  int second = second();
+  
+  // Format date and time with leading zeros
+  String formattedDateTime = nf(year, 4) + nf(month, 2) + nf(day, 2) + nf(hour, 2) + nf(minute, 2) + nf(second, 2);
+  
+  return formattedDateTime;
+}
