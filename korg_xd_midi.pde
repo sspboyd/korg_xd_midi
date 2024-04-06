@@ -14,12 +14,12 @@ float hue_base, hue_rng, bkg_clr;
 float rot_vel; // rotational velocity. How fast and in what direction -1 , 1
 float curr_rot; // in radians
 float max_rot_vel = TWO_PI/123;
-boolean shape_type=false; // circle or line
+String shape_type="circle"; // circle, line or circle_line
 
 
 void setup() {
-  size(800, 800);
-  // fullScreen();
+  // size(800, 800);
+  fullScreen();
   colorMode(HSB, 1.0);
   background(.618, .618, .32);
   println("pre list");
@@ -62,11 +62,20 @@ void draw() {
     rotate(polar_off);
     stroke(hue, 1, 1, circ_sw_alpha);
 
-    if (shape_type) {
+
+    switch(shape_type) {
+    case "line":
       line(0, circ_polar_off, 0+circ_radius, circ_polar_off+circ_radius);
-    } else {
+      break;
+    case "circle":
       ellipse(0, circ_polar_off, circ_radius, circ_radius);
+      break;
+    case "circle_line":
+      ellipse(0, circ_polar_off, circ_radius, circ_radius);
+      line(0, circ_polar_off, 0+circ_radius, circ_polar_off+circ_radius);
+      break;
     }
+
     //rect(0, circ_polar_off, circ_radius, circ_polar_off+circ_radius);
     //ellipse(random(pow(1.618,i)), circ_polar_off+random(pow(1.618,i)),1,1);
     pop();
@@ -93,15 +102,19 @@ void controllerChange(int channel, int number, int value) {
   println();
   println("Controller Change – Channel: "+channel+", Number: "+number+ ", Value: "+value);
 
-  if (number == 24) circ_radius = map(value, 0, 127, width*pow(.618, 7), width); // LFO RATE
-  if (number == 26) circ_sw = map(value, 64, 127, 0.32, 521); // LFO INT
+  if (number == 36) num_circs = int(map(value, 0, 127, 1, max_num_circs)); // VCO 1 SHAPE
   if (number == 43) circ_polar_off = map(value, 127, 0, 0, width/2); // FILTER CUTOFF
-  if (number == 44) circ_sw_alpha = map(value, 0, 127, 0, 1); // RES
-  if (number == 39) num_circs = int(map(value, 0, 127, 1, max_num_circs)); // VCO 1 LVL
-  if (number == 40) hue_base = map(value, 0, 127, 0, 1); // VCO 2 LVL
-  if (number == 33) hue_rng = map(value, 0, 127, 0, 1); // VCO 3 LVL
+  if (number == 44) circ_radius = map(value, 0, 127, width*pow(.618, 7), width); // LFO RATE
+  if (number == 16) circ_sw = map(value, 0, 127, 0.32, 521); 
+  if (number == 19) circ_sw_alpha = map(value, 0, 127, 0.055709, 1); // RES
+  if (number == 24) hue_base = map(value, 0, 127, 0, 1); // AMP EG RELEASE
+  if (number == 26) hue_rng = map(value, 64, 127, 0, 1); // LFO INT
   if (number == 80) bkg_clr = map(value, 0, 127, 0, 1); // SYNC
-  if (number == 81) shape_type = parseBoolean(int(map(value, 0, 127, 0, 1))); // RING
+  if (number == 50) {
+    if (value == 127) shape_type = "circle";
+    if (value == 64) shape_type = "line";
+    if (value == 0) shape_type = "circle_line";
+  }
   if (number == 22) { // EG INT
     rot_vel = map(value, 0, 127, -max_rot_vel, max_rot_vel);
     if (value == 64) rot_vel = 0;
@@ -111,14 +124,14 @@ void controllerChange(int channel, int number, int value) {
 }
 
 void keyPressed() {
-if (key == 's' || key == 'S') {
+  if (key == 's' || key == 'S') {
     String export_filename_png = "output/korg_xd_midi-"+get_curr_datetime()+".png";
-    pg.save(export_filename_png);
+    save(export_filename_png);
     println("Saved to: " + export_filename_png);
   }
 }
 
-  String get_curr_datetime() {
+String get_curr_datetime() {
   // Get current date and time
   int year = year();
   int month = month();
@@ -126,9 +139,9 @@ if (key == 's' || key == 'S') {
   int hour = hour();
   int minute = minute();
   int second = second();
-  
+
   // Format date and time with leading zeros
   String formattedDateTime = nf(year, 4) + nf(month, 2) + nf(day, 2) + nf(hour, 2) + nf(minute, 2) + nf(second, 2);
-  
+
   return formattedDateTime;
 }
