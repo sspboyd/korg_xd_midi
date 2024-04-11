@@ -7,7 +7,7 @@ float circ_radius = 100;
 int circ_x, circ_y;
 int num_circs=1;
 int max_num_circs = 123;
-float circ_sw=1; // strokeWeight
+float circ_sw=2; // strokeWeight
 float circ_polar_off=0;
 float circ_sw_alpha = 255;
 float hue_base, hue_rng, bkg_clr;
@@ -19,6 +19,7 @@ String shape_type="circle"; // circle, line or circle_line
 
 void setup() {
   // size(800, 800);
+  // size(606, 1080);
   fullScreen();
   colorMode(HSB, 1.0);
   background(.618, .618, .32);
@@ -101,16 +102,15 @@ void controllerChange(int channel, int number, int value) {
   // Receive a controllerChange
   println();
   println("Controller Change – Channel: "+channel+", Number: "+number+ ", Value: "+value);
-
   if (number == 36) num_circs = int(map(value, 0, 127, 1, max_num_circs)); // VCO 1 SHAPE
   if (number == 43) circ_polar_off = map(value, 127, 0, 0, width/2); // FILTER CUTOFF
-  if (number == 44) circ_radius = map(value, 0, 127, width*pow(.618, 7), width); // LFO RATE
-  if (number == 16) circ_sw = map(value, 0, 127, 0.32, 521); 
-  if (number == 19) circ_sw_alpha = map(value, 0, 127, 0.055709, 1); // RES
-  if (number == 24) hue_base = map(value, 0, 127, 0, 1); // AMP EG RELEASE
+  if (number == 44) circ_radius = map(value, 0, 127, width*pow(.618, 7), width); // RESONANCE
+  if (number == 16) circ_sw = map(value, 0, 127, 2, 521); // AMP EG ATTACK
+  if (number == 19) circ_sw_alpha = map(value, 0, 127, 0.055709, 1); // AMP EG RELEASE
+  if (number == 24) hue_base = map(value, 0, 127, 0, 1); // LFO RATE
   if (number == 26) hue_rng = map(value, 64, 127, 0, 1); // LFO INT
   if (number == 80) bkg_clr = map(value, 0, 127, 0, 1); // SYNC
-  if (number == 50) {
+  if (number == 50) { // VCO 1 SHAPE
     if (value == 127) shape_type = "circle";
     if (value == 64) shape_type = "line";
     if (value == 0) shape_type = "circle_line";
@@ -118,8 +118,6 @@ void controllerChange(int channel, int number, int value) {
   if (number == 22) { // EG INT
     rot_vel = map(value, 0, 127, -max_rot_vel, max_rot_vel);
     if (value == 64) rot_vel = 0;
-
-    println(rot_vel);
   }
 }
 
